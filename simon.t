@@ -1,11 +1,11 @@
-View.Set ("graphics:779;850,nobuttonbar")
+View.Set ("graphics:720;850,nobuttonbar")
 
 var arrSimon : array 1 .. 5 of int
-arrSimon (1) := Pic.FileNew ("assets/textures/green.jpg")
-arrSimon (2) := Pic.FileNew ("assets/textures/red.jpg")
-arrSimon (3) := Pic.FileNew ("assets/textures/blue.jpg")
-arrSimon (4) := Pic.FileNew ("assets/textures/yellow.jpg")
-arrSimon (5) := Pic.FileNew ("assets/textures/blank.jpg")
+arrSimon (1) := Pic.FileNew ("assets/textures/green.gif")
+arrSimon (2) := Pic.FileNew ("assets/textures/red.gif")
+arrSimon (3) := Pic.FileNew ("assets/textures/blue.gif")
+arrSimon (4) := Pic.FileNew ("assets/textures/yellow.gif")
+arrSimon (5) := Pic.FileNew ("assets/textures/base.gif")
 
 function generateSequence (iSequenceLength : int) : string
     var sequence : string := ""
