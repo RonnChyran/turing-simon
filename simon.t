@@ -173,10 +173,10 @@ procedure mainLoop
 	    var selectedColor : int
 	    selectedColor := black
 	    loop
-	    
-		exit when not Mouse.ButtonMoved ("down") and selectedColor not= black
-		Mouse.ButtonWait ("down", x, y, buttonNumber, buttonUpDown)
+		var buttonDown : int 
+		Mouse.Where(x, y, buttonDown)
 		selectedColor := whatdotcolor(x,y)
+		exit when buttonDown = 1 and selectedColor not= black
 	    end loop
 	    
 	    loop
