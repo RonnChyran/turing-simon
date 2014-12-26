@@ -1,8 +1,12 @@
 import GUI
-View.Set ("graphics:720;800,nobuttonbar,position:centre,centre")
+View.Set ("graphics:720;800,nobuttonbar,position:centre,centre,offscreenonly")
+
+
+var turnNumber : int := 0
+var scoreNumber : int := 0
 
 var startScreen : int
-startScreen := Pic.FileNew("assets/textures/simon.jpeg")
+startScreen := Pic.FileNew ("assets/textures/simon.jpeg")
 
 var arrSimon : array 1 .. 5 of int
 arrSimon (1) := Pic.FileNew ("assets/textures/green.gif")
@@ -33,6 +37,15 @@ const BTN_UNLIT := 5
 
 const ROUND_LIMIT := 31
 
+const SCORE_RENDER_Y := 380
+const SCORE_RENDER_X := 300
+const TURN_RENDER_Y := 300
+
+const I18N_LOADING := "loading.."
+const I18N_SIMON_TURN := "Simon's Turn"
+const I18N_YOUR_TURN := "Your Turn"
+const I18N_SCORE := "Score: "
+const I18N_TURN := "Turn: "
 
 function generateSequence (sequenceLength : int) : string
     var sequence : string := ""
@@ -103,12 +116,23 @@ procedure getColorsFromSequence (var arrColors : array 1 .. * of int, sequence :
     end for
 end getColorsFromSequence
 
+
+procedure drawScore (score : int, turn : int)
+    Font.Draw (I18N_SCORE + intstr (score), SCORE_RENDER_X, SCORE_RENDER_Y, segoe, white)
+    Font.Draw (I18N_TURN + intstr (turn), SCORE_RENDER_X, TURN_RENDER_Y, segoe, white)
+
+    View.Update
+end drawScore
+
 procedure renderLitColor (btnNumber : int)
     Pic.Draw (arrSimon (btnNumber), 5, 0, picCopy)
+    drawScore (scoreNumber, turnNumber)
+    View.Update
 end renderLitColor
 
 procedure drawBackground (bgColor : int)
     drawfillbox (0, 0, maxx, maxy, bgColor)
+    View.Update
 end drawBackground
 
 procedure renderBlank
@@ -117,14 +141,13 @@ end renderBlank
 
 procedure drawStatus (message : string)
     Font.Draw (message, 10, maxy - 50, segoe, white)
+    View.Update
 end drawStatus
-
-
 
 
 procedure renderBuffer
     drawBackground (black)
-    drawStatus ("loading..")
+    drawStatus (I18N_LOADING)
     delay (1000)
     cls
     drawBackground (black)
@@ -143,34 +166,42 @@ end renderSequence
 
 
 
-procedure failState (correctButtonPresses : int, roundsCompleted : int)
-   
+procedure failState
+    for i : 0 .. 360
+	Draw.FillArc (maxx div 2, maxy div 2, maxx, maxy, 0, i, white)
+	delay (5)
+	View.Update
+    end for
 end failState
 
 
 procedure winState
+    for i : 0 .. 360
+	Draw.FillArc (maxx div 2, maxy div 2, maxx, maxy, 0, i, red)
+	delay (5)
+	View.Update
+    end for
 end winState
-
 
 
 procedure mainLoop
     var x, y, buttonNumber, buttonUpDown : int
-
     var failStateTrue : boolean := false
     var correctButtonPresses : int := 0
     var sequence : string := ""
     renderBuffer
     for r : 1 .. ROUND_LIMIT
+	turnNumber := r
 	randAppendSequence (sequence)
 	var arrColors : array 1 .. length (sequence) of int
 	getColorsFromSequence (arrColors, sequence)
-	drawBackground(black)
+	drawBackground (black)
 	renderBlank
-	drawStatus ("Simon's Turn!")
+	drawStatus (I18N_SIMON_TURN)
 	renderSequence (sequence)
-	drawBackground(black)
+	drawBackground (black)
 	renderBlank
-	drawStatus ("Your Turn!")
+	drawStatus (I18N_YOUR_TURN)
 
 	for i : 1 .. length (sequence)
 	    var selectedColor : int
@@ -189,12 +220,21 @@ procedure mainLoop
 		exit when buttonUp = 0
 	    end loop
 	    if getBtnFromUnlit (selectedColor) not= strint (sequence (i)) then
-		put "FAIL"
+		failStateTrue := true
+		exit
 	    end if
+	    scoreNumber += 1
 	    renderBlank
 	end for
+	if failStateTrue then
+	    exit
+	end if
     end for
-    winState
+    if failStateTrue then
+	failState
+    else
+	winState
+    end if
 end mainLoop
 
 
@@ -205,6 +245,7 @@ drawBackground (41)
 var x, y, button, buttonupdown : int
 
 Pic.Draw (startScreen, 0, 0, picCopy)
+View.Update
 
 loop
 
