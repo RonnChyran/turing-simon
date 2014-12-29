@@ -1,12 +1,14 @@
 import GUI
-View.Set ("graphics:720;800,nobuttonbar,position:centre,centre,offscreenonly")
+View.Set ("graphics:720;800,nobuttonbar,position:centre,centre,offscreenonly,title:Simon Says!")
 
 
 var turnNumber : int := 0
 var scoreNumber : int := 0
 
-var startScreen : int
-startScreen := Pic.FileNew ("assets/textures/simon.jpeg")
+var startScreen, failScreen, winScreen : int
+startScreen := Pic.FileNew ("assets/textures/start.gif")
+failScreen := Pic.FileNew ("assets/textures/lose.gif")
+winScreen := Pic.FileNew ("assets/textures/win.gif")
 
 var arrSimon : array 1 .. 5 of int
 arrSimon (1) := Pic.FileNew ("assets/textures/green.gif")
@@ -40,6 +42,7 @@ const ROUND_LIMIT := 31
 const SCORE_RENDER_Y := 380
 const SCORE_RENDER_X := 300
 const TURN_RENDER_Y := 300
+const TURN_RENDER_X := 310
 
 const I18N_LOADING := "loading.."
 const I18N_SIMON_TURN := "Simon's Turn"
@@ -119,7 +122,7 @@ end getColorsFromSequence
 
 procedure drawScore (score : int, turn : int)
     Font.Draw (I18N_SCORE + intstr (score), SCORE_RENDER_X, SCORE_RENDER_Y, segoe, white)
-    Font.Draw (I18N_TURN + intstr (turn), SCORE_RENDER_X, TURN_RENDER_Y, segoe, white)
+    Font.Draw (I18N_TURN + intstr (turn), TURN_RENDER_X, TURN_RENDER_Y, segoe, white)
 
     View.Update
 end drawScore
@@ -172,6 +175,9 @@ procedure failState
 	delay (5)
 	View.Update
     end for
+    Pic.Draw (failScreen, 0, 0, picCopy)
+    Font.Draw (intstr(scoreNumber), maxx - 300, 45, segoeBold, white)
+    View.Update
 end failState
 
 
@@ -181,6 +187,9 @@ procedure winState
 	delay (5)
 	View.Update
     end for
+    Pic.Draw (winScreen, 0, 0, picCopy)
+    Font.Draw (intstr(scoreNumber), maxx - 300, 45, segoeBold, white)
+    View.Update
 end winState
 
 
