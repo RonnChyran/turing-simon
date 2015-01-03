@@ -219,8 +219,8 @@ procedure mainLoop
 		var buttonDown : int
 		Mouse.Where (x, y, buttonDown)
 		selectedColor := whatdotcolor (x, y)
-		exit when buttonDown = 1 and selectedColor not= black
-	    end loop
+		exit when buttonDown = 1 and selectedColor not= black and selectedColor not= white and (selectedColor = UNLIT_GREEN or selectedColor = UNLIT_RED or selectedColor = UNLIT_YELLOW or
+		    selectedColor = UNLIT_BLUE) %whitelist colors to prevent clicking outside of screen	    end loop
 	    play ("B")
 	    loop
 		var buttonUp : int
