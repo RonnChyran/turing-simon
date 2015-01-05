@@ -1,4 +1,3 @@
-import GUI
 View.Set ("graphics:720;800,nobuttonbar,position:centre,centre,offscreenonly,title:Simon Says!")
 
 /**
@@ -365,7 +364,7 @@ procedure failState
 end failState
 
 /**
- * This function is called when the player wins. 31 turns are required to win the game
+ * This function is called when the player wins. RAND_LIMIT turns are required to win the game
  * Draws the win endstate card and shows their final score
  */
 procedure winState
@@ -383,22 +382,24 @@ end winState
  * The main game loop
  */
 procedure mainLoop
-    var x, y, buttonNumber, buttonUpDown : int
-    var failStateTrue : boolean := false
-    var correctButtonPresses : int := 0
-    var sequence : string := ""
-    renderBuffer
+    var x, y, buttonNumber, buttonUpDown : int %Mouse.ButtonWait vars
+    var failStateTrue : boolean := false %this is toggled to true if the player loses
+    var correctButtonPresses : int := 0 %number of correct button presses
+    var sequence : string := "" %the simon button sequence. This is appended to every turn
+    renderBuffer %Render a mouse-queue clearing buffer
     for r : 1 .. ROUND_LIMIT
-	iTurnNumber := r
-	randAppendSequence (sequence)
-	drawBackground (black)
-	renderBlank
+	iTurnNumber := r %set the current turn number to iteration number
+	randAppendSequence (sequence) %append a random button to the sequence
+	drawBackground (black) 
+	renderBlank 
 	drawStatus (I18N_SIMON_TURN)
 	renderSequence (sequence)
 	drawBackground (black)
 	renderBlank
 	drawStatus (I18N_YOUR_TURN)
 
+	%Wait for inputs for the length of the sequence
+	%If the input doesn't match the color in that index of the sequence, it will toggle failstate to true
 	for i : 1 .. length (sequence)
 	    var selectedColor : int
 	    selectedColor := black
@@ -409,14 +410,14 @@ procedure mainLoop
 		exit when buttonDown = 1 and selectedColor not= black and selectedColor not= white and (selectedColor = UNLIT_GREEN or selectedColor = UNLIT_RED or selectedColor = UNLIT_YELLOW or
 		    selectedColor = UNLIT_BLUE) %whitelist colors to prevent clicking outside of screen
 	    end loop
-	    play ("B")
+	    play ("B") %Play a sound to indicate button pressed
 	    loop
 		var buttonUp : int
 		Mouse.Where (x, y, buttonUp)
-		renderLitColor (getBtnFromUnlit (selectedColor))
+		renderLitColor (getBtnFromUnlit (selectedColor)) %Render the color as lit if the player presses the button
 		exit when buttonUp = 0
 	    end loop
-	    if getBtnFromUnlit (selectedColor) not= strint (sequence (i)) then
+	    if getBtnFromUnlit (selectedColor) not= strint (sequence (i)) then %If the selected color is not the correct button index toggle failstate
 		failStateTrue := true
 		exit
 	    end if
@@ -424,13 +425,13 @@ procedure mainLoop
 	    renderBlank
 	end for
 	if failStateTrue then
-	    exit
+	    exit %If failstate, terminate loop and jump to procedure end
 	end if
     end for
     if failStateTrue then
-	failState
+	failState %jump to failState if player failed
     else
-	winState
+	winState %jump to winState if player managed finish ROUND_LIMIT iterations
     end if
 end mainLoop
 
@@ -456,3 +457,5 @@ procedure entryLoop
 	end if
     end loop
 end entryLoop
+
+entryLoop %Initial call into entry loop
