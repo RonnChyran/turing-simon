@@ -71,6 +71,10 @@ var font_segoe : int := Font.New ("Segoe UI:24")
  */
 var font_impact : int := Font.New ("Impact:24")
 
+/**
+ * Number of simon buttons to use
+ */
+var buttonCount : int := 4
 
 /**
  * The color code for the lit green simon button
@@ -283,7 +287,7 @@ end getBtnFromUnlit
  * @param var sqeuence The sequence to append
  */
 procedure randAppendSequence (var sequence : string)
-    sequence += intstr (Rand.Int (1, 4))
+    sequence += intstr (Rand.Int (1, buttonCount))
 end randAppendSequence
 
 /**
@@ -459,10 +463,50 @@ end mainLoop
 procedure entryLoop
 
     var x, y, button, buttonupdown : int %Mouse.ButtonWait variables
+    var chars : array char of boolean
+
+    /* Represent the Konami Code (Up Up Down Down Left Right Left Right B A) as an array of chars */
+    var konamiCode : array 1 .. 10 of char
+    konamiCode (1) := KEY_UP_ARROW
+    konamiCode (2) := KEY_UP_ARROW
+    konamiCode (3) := KEY_DOWN_ARROW
+    konamiCode (4) := KEY_DOWN_ARROW
+    konamiCode (5) := KEY_LEFT_ARROW
+    konamiCode (6) := KEY_LEFT_ARROW
+    konamiCode (7) := KEY_RIGHT_ARROW
+    konamiCode (8) := KEY_RIGHT_ARROW
+    konamiCode (9) := 'b'
+    konamiCode (10) := 'a'
+    var konamiCodeCounter : int := 1
+
 
     Pic.Draw (startScreen, 0, 0, picCopy) %Draw the start state card
     View.Update
     loop
+	if konamiCodeCounter = 11 then /*If the user has pressed all the previous keys activate win*/
+	    iScoreNumber := 1337 /*1337haxx0rz*/
+	    winState
+	    exit
+	else
+	    Input.KeyDown (chars) /*Check if a key has been pressed*/
+	    if chars (konamiCode (konamiCodeCounter)) then
+		konamiCodeCounter += 1 /*If part of the Konami code has been pressed go to the next key*/
+	    end if
+	    /*Determine number of buttons to use*/
+	    if chars ('1') then
+		buttonCount := 1
+	    end if
+	    if chars ('2') then
+		buttonCount := 2
+	    end if
+	    if chars ('3') then
+		buttonCount := 3
+	    end if
+	    if chars ('4') then
+		buttonCount := 4
+	    end if
+	end if
+
 
 	Mouse.Where (x, y, button)
 	if button = 1 then
