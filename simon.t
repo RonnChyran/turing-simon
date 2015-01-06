@@ -1,196 +1,210 @@
 View.Set ("graphics:720;800,nobuttonbar,position:centre,centre,offscreenonly,title:Simon Says!")
 
 /**
-* The current turn number
-*/
+ * The current turn number
+ */
 var iTurnNumber : int := 0
 /**
-* The current score number
-*/
+ * The current score number
+ */
 var iScoreNumber : int := 0
 
 
 var startScreen, failScreen, winScreen : int
 
 /**
-* The start screen card
-*/
+ * The start screen card
+ */
 startScreen := Pic.FileNew ("assets/textures/start.gif")
 
 /**
-* The fail end-state card
-*/
+ * The fail end-state card
+ */
 failScreen := Pic.FileNew ("assets/textures/lose.gif")
 
 /**
-* The win end-state card
-*/
+ * The win end-state card
+ */
 winScreen := Pic.FileNew ("assets/textures/win.gif")
 
 
 var arrSimon : array 1 .. 5 of int
 
 /**
-* The green-lit simon state
-*/
+ * The green-lit simon state
+ */
 arrSimon (1) := Pic.FileNew ("assets/textures/green.gif")
 
 /**
-* The red-lit simon state
-*/
+ * The red-lit simon state
+ */
 arrSimon (2) := Pic.FileNew ("assets/textures/red.gif")
 
 /**
-* The blue-lit simon state
-*/
+ * The blue-lit simon state
+ */
 arrSimon (3) := Pic.FileNew ("assets/textures/blue.gif")
 
 /**
-* The yellow-lit simon state
-*/
+ * The yellow-lit simon state
+ */
 arrSimon (4) := Pic.FileNew ("assets/textures/yellow.gif")
 
 /**
-* The unlit simon state
-*/
+ * The unlit simon state
+ */
 arrSimon (5) := Pic.FileNew ("assets/textures/base.gif")
 
 
 /**
-* 24pt Segoe UI Bold Font
-*/
+ * 24pt Segoe UI Bold Font
+ */
 var font_segoeBold : int := Font.New ("Segoe UI Bold:24")
 
 /**
-* 24pt Segoe UI Font
-*/
+ * 24pt Segoe UI Font
+ */
 var font_segoe : int := Font.New ("Segoe UI:24")
 
 /**
-* 24pt Impact Font
-*/
+ * 24pt Impact Font
+ */
 var font_impact : int := Font.New ("Impact:24")
 
 
 /**
-* The color code for the lit green simon button
-*/
+ * The color code for the lit green simon button
+ */
 const LIT_GREEN := 10
 
 /**
-* The color code for the lit red simon button
-*/
+ * The color code for the lit red simon button
+ */
 const LIT_RED := 12
 
 /**
-* The color code for the lit blue simon button
-*/
+ * The color code for the lit blue simon button
+ */
 const LIT_BLUE := 11
 
 /**
-* The color code for the lit yellow simon button
-*/
+ * The color code for the lit yellow simon button
+ */
 const LIT_YELLOW := 14
 
 
 /**
-* The color code for the unlit green simon button
-*/
+ * The color code for the unlit green simon button
+ */
 const UNLIT_GREEN := 215
 
 /**
-* The color code for the unlit red simon button
-*/
+ * The color code for the unlit red simon button
+ */
 const UNLIT_RED := 112
 
 /**
-* The color code for the unlit blue simon button
-*/
+ * The color code for the unlit blue simon button
+ */
 const UNLIT_BLUE := 151
 
 /**
-* The color code for the unlit yellow simon button
-*/
+ * The color code for the unlit yellow simon button
+ */
 const UNLIT_YELLOW := 115
 
 
 /**
-* The array index for the lit green simon button
-*/
+ * The array index for the lit green simon button
+ */
 const BTN_GREEN := 1
 
 /**
-* The array index for the lit red simon button
-*/
+ * The array index for the lit red simon button
+ */
 const BTN_RED := 2
 
 /**
-* The array index for the lit blue simon button
-*/
+ * The array index for the lit blue simon button
+ */
 const BTN_BLUE := 3
 
 /**
-* The array index for the lit yellow simon button
-*/
+ * The array index for the lit yellow simon button
+ */
 const BTN_YELLOW := 4
 
 /**
-* The array index for the all buttons unlit
-*/
+ * The array index for the all buttons unlit
+ */
 const BTN_UNLIT := 5
 
 /**
-* The number of rounds required to pass before a win end-state is declared
-*/
+ * The number of rounds required to pass before a win end-state is declared
+ */
 const ROUND_LIMIT := 31
 
 /**
-* The Y value to render the score number
-* @see drawCenterScore
-*/
+ * The Y value to render the score number
+ * @see drawCenterScore
+ */
 const SCORE_RENDER_Y := 380
 
 /**
-* The X value to render the score number
-* @see drawCenterScore
-*/
+ * The X value to render the score number
+ * @see drawCenterScore
+ */
 const SCORE_RENDER_X := 300
 
 /**
-* The Y value to render the turn number
-* @see drawCenterScore
-*/
+ * The Y value to render the turn number
+ * @see drawCenterScore
+ */
 const TURN_RENDER_Y := 300
 
 /**
-* The X value to render the turn number
-* @see drawCenterScore
-*/
+ * The X value to render the turn number
+ * @see drawCenterScore
+ */
 const TURN_RENDER_X := 310
 
 /**
-* Internationlization string for loading message
-*/
+ * The filename to the beep sound effect
+ */
+const SOUND_BEEP := "assets/sound/beep.wav"
+
+/**
+ * The filename to the beep sound effect
+ */
+const SOUND_WIN := "assets/sound/win.mp3"
+
+/**
+ * The filename to the beep sound effect
+ */
+const SOUND_FAIL := "assets/sound/fail.wav"
+/**
+ * Internationlization string for loading message
+ */
 const I18N_LOADING := "loading.."
 
 /**
-* Internationlization string for Simon's turn
-*/
+ * Internationlization string for Simon's turn
+ */
 const I18N_SIMON_TURN := "Simon's Turn"
 
 /**
-* Internationlization string for Player's turn
-*/
+ * Internationlization string for Player's turn
+ */
 const I18N_YOUR_TURN := "Your Turn"
 
 /**
-* Internationlization string for score indication prefix
-*/
+ * Internationlization string for score indication prefix
+ */
 const I18N_SCORE := "score: "
 
 /**
-* Internationlization string for turn indication prefix
-*/
+ * Internationlization string for turn indication prefix
+ */
 const I18N_TURN := "turn: "
 
 /**
@@ -341,7 +355,7 @@ procedure renderSequence (sequence : string)
     delay (500)
     for i : 1 .. length (sequence)
 	renderLitColor (strint (sequence (i)))
-	play ("A")
+	Music.PlayFile (SOUND_BEEP)
 	delay (1000)
 	renderBlank
 	delay (500)
@@ -376,6 +390,7 @@ procedure winState
     Pic.Draw (winScreen, 0, 0, picCopy)
     Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
     View.Update
+    Music.PlayFile (SOUND_WIN)
 end winState
 
 /**
@@ -390,8 +405,8 @@ procedure mainLoop
     for r : 1 .. ROUND_LIMIT
 	iTurnNumber := r %set the current turn number to iteration number
 	randAppendSequence (sequence) %append a random button to the sequence
-	drawBackground (black) 
-	renderBlank 
+	drawBackground (black)
+	renderBlank
 	drawStatus (I18N_SIMON_TURN)
 	renderSequence (sequence)
 	drawBackground (black)
@@ -410,7 +425,7 @@ procedure mainLoop
 		exit when buttonDown = 1 and selectedColor not= black and selectedColor not= white and (selectedColor = UNLIT_GREEN or selectedColor = UNLIT_RED or selectedColor = UNLIT_YELLOW or
 		    selectedColor = UNLIT_BLUE) %whitelist colors to prevent clicking outside of screen
 	    end loop
-	    play ("B") %Play a sound to indicate button pressed
+	    Music.PlayFile (SOUND_BEEP) %Play a sound to indicate button pressed
 	    loop
 		var buttonUp : int
 		Mouse.Where (x, y, buttonUp)
@@ -425,6 +440,7 @@ procedure mainLoop
 	    renderBlank
 	end for
 	if failStateTrue then
+	    Music.PlayFile (SOUND_FAIL)
 	    exit %If failstate, terminate loop and jump to procedure end
 	end if
     end for
@@ -437,14 +453,17 @@ end mainLoop
 
 
 /**
-* Start-screen loop
-* Waits for button press before jumping to {@link #mainLoop}
-*/
+ * Start-screen loop
+ * Waits for button press before jumping to {@link #mainLoop}
+ */
 procedure entryLoop
+
     var x, y, button, buttonupdown : int %Mouse.ButtonWait variables
+
     Pic.Draw (startScreen, 0, 0, picCopy) %Draw the start state card
     View.Update
     loop
+
 	Mouse.Where (x, y, button)
 	if button = 1 then
 	    loop
@@ -458,4 +477,4 @@ procedure entryLoop
     end loop
 end entryLoop
 
-entryLoop %Initial call into entry loop
+entryLoop     %Initial call into entry loop
