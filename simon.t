@@ -1,3 +1,53 @@
+/*
+ #This header is valid YAML 1.2 and can be parsed as such
+ File: "simon.t"
+ Author: "Ronny Chan"
+ Class: ICS2O1
+ Date: "7 January 2015"
+ Purpose: >
+       Simulate the 'Simon' memory game.
+ Input: 
+     Start Screen:
+         - "Number of buttons to use"
+         - "Konami 'cheat code'"
+     Game:
+         - "Each 'Simon' Button is clickable"
+ Output: 
+     - "A sequence of colours will flash that the player should repeat"
+     - "Either a Win or a Fail state depending on whether the player has completed the (by default) 31 turns needed"
+ Process:
+     Start Screen:
+         - "Draw the start screen"
+         - "Listen for keypresses for either numbers 1-4 to set number of buttons, or the Konami Code (Up-Up-Down-Down-Left-Right-Left-Right-B-A) for cheat (instant win)"
+         - "Listen for click to proceed to game screen"
+     Game:
+         - "Append a number (1-4 by default) to a sequence"
+         - "Parse each number in the sequence and display the corresponding image that has that button lit up"
+         - "Wait for user to repeat the displayed sequence"
+         - "Determine if the user has made a mistake by getting the colour clicked, if so, jump to fail state"
+         - "If 31 (by default) iterations have passed jump to win state"
+     Win/Fail State:
+         - "Display wipe-out animation"
+         - "Display either the win or fail state picture"
+         - "Display the user's final score"
+         - "Play a victory or failure tune"
+ Assets: #This program will not run properly without the proper assets
+     textures:
+         'base.gif': "The image of all simon buttons unlit"
+         'blue.gif': "The image of the blue simon button lit"
+         'green.gif': "The image of the green simon button lit"
+         'red.gif': "The image of the red simon button lit"
+         'start.gif': "The start screen image"
+         'win.gif': "The image displayed in winstate"
+         'lose.gif': "The image displayed in failstate"
+     sound:
+         'beep.wav': "Played when a simon button is lit up"
+         'fail.wav': "Played when the player loses"
+         'win.mp3': "Played when the player wins"
+ License: "All code is licensed under the MIT License, and all textures are under CC0 1.0 Universal License. Sound assets are copyright of their respective owners"
+*/
+
+
 View.Set ("graphics:720;800,nobuttonbar,position:centre,centre,offscreenonly,title:Simon Says!")
 
 /**
@@ -212,33 +262,20 @@ const I18N_SCORE := "score: "
 const I18N_TURN := "turn: "
 
 /**
- * Generates a sequence of buttons to be lit
- * @param sequenceLength The length of the sequence
- * @returns A sequence with the specified length as string
- */
-function generateSequence (sequenceLength : int) : string
-    var sequence : string := ""
-    for i : 1 .. sequenceLength
-	sequence += intstr (Rand.Int (1, 4))
-    end for
-    result sequence
-end generateSequence
-
-/**
  * Gets the unlit color value for a given button index
  * @param btnNumber The button index to get the unlit color for
  * @returns The turing color code for the unlit color of a certain button
  */
 function getUnlitColor (btnNumber : int) : int
     case btnNumber of
-	label BTN_GREEN :
-	    result UNLIT_GREEN
-	label BTN_RED :
-	    result UNLIT_RED
-	label BTN_BLUE :
-	    result UNLIT_BLUE
-	label BTN_YELLOW :
-	    result UNLIT_YELLOW
+        label BTN_GREEN :
+            result UNLIT_GREEN
+        label BTN_RED :
+            result UNLIT_RED
+        label BTN_BLUE :
+            result UNLIT_BLUE
+        label BTN_YELLOW :
+            result UNLIT_YELLOW
     end case
     result black
 end getUnlitColor
@@ -250,14 +287,14 @@ end getUnlitColor
  */
 function getLitColor (btnNumber : int) : int
     case btnNumber of
-	label BTN_GREEN :
-	    result LIT_GREEN
-	label BTN_RED :
-	    result LIT_RED
-	label BTN_BLUE :
-	    result LIT_BLUE
-	label BTN_YELLOW :
-	    result LIT_YELLOW
+        label BTN_GREEN :
+            result LIT_GREEN
+        label BTN_RED :
+            result LIT_RED
+        label BTN_BLUE :
+            result LIT_BLUE
+        label BTN_YELLOW :
+            result LIT_YELLOW
     end case
     result black
 end getLitColor
@@ -270,14 +307,14 @@ end getLitColor
  */
 function getBtnFromUnlit (btnColor : int) : int
     case btnColor of
-	label UNLIT_GREEN :
-	    result BTN_GREEN
-	label UNLIT_RED :
-	    result BTN_RED
-	label UNLIT_BLUE :
-	    result BTN_BLUE
-	label UNLIT_YELLOW :
-	    result BTN_YELLOW
+        label UNLIT_GREEN :
+            result BTN_GREEN
+        label UNLIT_RED :
+            result BTN_RED
+        label UNLIT_BLUE :
+            result BTN_BLUE
+        label UNLIT_YELLOW :
+            result BTN_YELLOW
     end case
     result BTN_UNLIT
 end getBtnFromUnlit
@@ -358,11 +395,11 @@ end renderBuffer
 procedure renderSequence (sequence : string)
     delay (500)
     for i : 1 .. length (sequence)
-	renderLitColor (strint (sequence (i)))
-	Music.PlayFile (SOUND_BEEP)
-	delay (1000)
-	renderBlank
-	delay (500)
+        renderLitColor (strint (sequence (i)))
+        Music.PlayFile (SOUND_BEEP)
+        delay (1000)
+        renderBlank
+        delay (500)
     end for
 end renderSequence
 
@@ -372,9 +409,9 @@ end renderSequence
  */
 procedure failState
     for i : 0 .. 360
-	Draw.FillArc (maxx div 2, maxy div 2, maxx, maxy, 0, i, white)
-	delay (5)
-	View.Update
+        Draw.FillArc (maxx div 2, maxy div 2, maxx, maxy, 0, i, white)
+        delay (5)
+        View.Update
     end for
     Pic.Draw (failScreen, 0, 0, picCopy)
     Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
@@ -387,9 +424,9 @@ end failState
  */
 procedure winState
     for i : 0 .. 360
-	Draw.FillArc (maxx div 2, maxy div 2, maxx, maxy, 0, i, red)
-	delay (5)
-	View.Update
+        Draw.FillArc (maxx div 2, maxy div 2, maxx, maxy, 0, i, red)
+        delay (5)
+        View.Update
     end for
     Pic.Draw (winScreen, 0, 0, picCopy)
     Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
@@ -407,51 +444,51 @@ procedure mainLoop
     var sequence : string := "" %the simon button sequence. This is appended to every turn
     renderBuffer %Render a mouse-queue clearing buffer
     for r : 1 .. ROUND_LIMIT
-	iTurnNumber := r %set the current turn number to iteration number
-	randAppendSequence (sequence) %append a random button to the sequence
-	drawBackground (black)
-	renderBlank
-	drawStatus (I18N_SIMON_TURN)
-	renderSequence (sequence)
-	drawBackground (black)
-	renderBlank
-	drawStatus (I18N_YOUR_TURN)
+        iTurnNumber := r %set the current turn number to iteration number
+        randAppendSequence (sequence) %append a random button to the sequence
+        drawBackground (black)
+        renderBlank
+        drawStatus (I18N_SIMON_TURN)
+        renderSequence (sequence)
+        drawBackground (black)
+        renderBlank
+        drawStatus (I18N_YOUR_TURN)
 
-	%Wait for inputs for the length of the sequence
-	%If the input doesn't match the color in that index of the sequence, it will toggle failstate to true
-	for i : 1 .. length (sequence)
-	    var selectedColor : int
-	    selectedColor := black
-	    loop
-		var buttonDown : int
-		Mouse.Where (x, y, buttonDown) %wait for player to press button
-		selectedColor := whatdotcolor (x, y) %get pressed color
-		exit when buttonDown = 1 and selectedColor not= black and selectedColor not= white and (selectedColor = UNLIT_GREEN or selectedColor = UNLIT_RED or selectedColor = UNLIT_YELLOW or
-		    selectedColor = UNLIT_BLUE) %whitelist colors to prevent clicking outside of screen
-	    end loop
-	    Music.PlayFile (SOUND_BEEP) %Play a sound to indicate button pressed
-	    loop
-		var buttonUp : int
-		Mouse.Where (x, y, buttonUp)
-		renderLitColor (getBtnFromUnlit (selectedColor)) %Render the color as lit if the player presses the button
-		exit when buttonUp = 0
-	    end loop
-	    if getBtnFromUnlit (selectedColor) not= strint (sequence (i)) then %If the selected color is not the correct button index toggle failstate
-		failStateTrue := true
-		exit
-	    end if
-	    iScoreNumber += 1
-	    renderBlank
-	end for
-	if failStateTrue then
-	    Music.PlayFile (SOUND_FAIL)
-	    exit %If failstate, terminate loop and jump to procedure end
-	end if
+        %Wait for inputs for the length of the sequence
+        %If the input doesn't match the color in that index of the sequence, it will toggle failstate to true
+        for i : 1 .. length (sequence)
+            var selectedColor : int
+            selectedColor := black
+            loop
+                var buttonDown : int
+                Mouse.Where (x, y, buttonDown) %wait for player to press button
+                selectedColor := whatdotcolor (x, y) %get pressed color
+                exit when buttonDown = 1 and selectedColor not= black and selectedColor not= white and (selectedColor = UNLIT_GREEN or selectedColor = UNLIT_RED or selectedColor = UNLIT_YELLOW or
+                    selectedColor = UNLIT_BLUE) %whitelist colors to prevent clicking outside of screen
+            end loop
+            Music.PlayFile (SOUND_BEEP) %Play a sound to indicate button pressed
+            loop
+                var buttonUp : int
+                Mouse.Where (x, y, buttonUp)
+                renderLitColor (getBtnFromUnlit (selectedColor)) %Render the color as lit if the player presses the button
+                exit when buttonUp = 0
+            end loop
+            if getBtnFromUnlit (selectedColor) not= strint (sequence (i)) then %If the selected color is not the correct button index toggle failstate
+                failStateTrue := true
+                exit
+            end if
+            iScoreNumber += 1
+            renderBlank
+        end for
+        if failStateTrue then
+            Music.PlayFile (SOUND_FAIL)
+            exit %If failstate, terminate loop and jump to procedure end
+        end if
     end for
     if failStateTrue then
-	failState %jump to failState if player failed
+        failState %jump to failState if player failed
     else
-	winState %jump to winState if player managed finish ROUND_LIMIT iterations
+        winState %jump to winState if player managed finish ROUND_LIMIT iterations
     end if
 end mainLoop
 
@@ -483,41 +520,41 @@ procedure entryLoop
     Pic.Draw (startScreen, 0, 0, picCopy) %Draw the start state card
     View.Update
     loop
-	if konamiCodeCounter = 11 then /*If the user has pressed all the previous keys activate win*/
-	    iScoreNumber := 1337 /*1337haxx0rz*/
-	    winState
-	    exit
-	else
-	    Input.KeyDown (chars) /*Check if a key has been pressed*/
-	    if chars (konamiCode (konamiCodeCounter)) then
-		konamiCodeCounter += 1 /*If part of the Konami code has been pressed go to the next key*/
-	    end if
-	    /*Determine number of buttons to use*/
-	    if chars ('1') then
-		buttonCount := 1
-	    end if
-	    if chars ('2') then
-		buttonCount := 2
-	    end if
-	    if chars ('3') then
-		buttonCount := 3
-	    end if
-	    if chars ('4') then
-		buttonCount := 4
-	    end if
-	end if
+        if konamiCodeCounter = 11 then /*If the user has pressed all the previous keys activate win*/
+            iScoreNumber := 1337 /*1337haxx0rz*/
+            winState
+            exit
+        else
+            Input.KeyDown (chars) /*Check if a key has been pressed*/
+            if chars (konamiCode (konamiCodeCounter)) then
+                konamiCodeCounter += 1 /*If part of the Konami code has been pressed go to the next key*/
+            end if
+            /*Determine number of buttons to use*/
+            if chars ('1') then
+                buttonCount := 1
+            end if
+            if chars ('2') then
+                buttonCount := 2
+            end if
+            if chars ('3') then
+                buttonCount := 3
+            end if
+            if chars ('4') then
+                buttonCount := 4
+            end if
+        end if
 
 
-	Mouse.Where (x, y, button)
-	if button = 1 then
-	    loop
-		exit when not Mouse.ButtonMoved ("down")
-		Mouse.ButtonWait ("down", x, y, button, buttonupdown)
-	    end loop
-	    cls
-	    mainLoop
-	    exit
-	end if
+        Mouse.Where (x, y, button)
+        if button = 1 then
+            loop
+                exit when not Mouse.ButtonMoved ("down")
+                Mouse.ButtonWait ("down", x, y, button, buttonupdown)
+            end loop
+            cls
+            mainLoop
+            exit
+        end if
     end loop
 end entryLoop
 
