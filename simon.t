@@ -5,7 +5,7 @@
  Class: ICS2O1
  Date: "7 January 2015"
  Purpose: >
- Simulate the 'Simon' memory game.
+      Simulate the 'Simon' memory game.
  Input:
      Start Screen:
 	  - "Number of buttons to use"
@@ -18,6 +18,7 @@
  Process:
      Start Screen:
 	  - "Draw the start screen"
+	  - "Load and display the high score"
 	  - "Play intro music"
 	  - "Listen for keypresses for either numbers 1-4 to set number of buttons, or the Konami Code (Up-Up-Down-Down-Left-Right-Left-Right-B-A) for cheat (instant win)"
 	  - "Listen for click to proceed to game screen"
@@ -32,6 +33,7 @@
 	  - "Display either the win or fail state picture"
 	  - "Display the user's final score"
 	  - "Play a victory or failure tune"
+	  - "Save the score if it's a high score"
 	  - "Either repeat or quit game"
  Assets: #This program will not run properly without the proper assets
      textures:
@@ -51,7 +53,51 @@
  */
 
 
+/**
+ * Represents a readable/writable file that stores a single line of text
+ */
+class TextFile
+    import File
+    export ctorTextFile, writeFile, readFile
+    var fileName : string
+    /*
+     * Write to the text file
+     * @param _input The text to write to the file
+     */
+    procedure writeFile (_input : string)
+	var fileNumber : int
+	open : fileNumber, fileName, write
+	write : fileNumber, _input
+	close : fileNumber
+    end writeFile
+
+    /*
+     * Read the contents of the text file
+     * @returns The contents of the file as a string
+     */
+    function readFile : string
+	var fileContents : string := ""
+	var fileNumber : int
+	open : fileNumber, fileName, read
+	read : fileNumber, fileContents
+	close : fileNumber
+	result fileContents
+    end readFile
+
+    /*
+     * TextFile constructor
+     * @param _fileName The filename of the file
+     */
+    procedure ctorTextFile (_fileName : string)
+	fileName := _fileName
+	if not File.Exists (fileName) then
+	    writeFile ("0")
+	end if
+    end ctorTextFile
+end TextFile
+
 View.Set ("graphics:720;800,nobuttonbar,position:centre,centre,offscreenonly,title:Simon Says!")
+
 /**
  * If true program will terminate after the round is over
  */
@@ -134,6 +180,11 @@ var font_impact : int := Font.New ("Impact:24")
 var buttonCount : int := 4
 
 /**
+ * File to store high score
+ */
+var highScoreFile : pointer to TextFile
+
+/**
  * The color code for the lit green simon button
  */
 const LIT_GREEN := 10
@@ -173,7 +224,6 @@ const UNLIT_BLUE := 151
  * The color code for the unlit yellow simon button
  */
 const UNLIT_YELLOW := 115
-
 
 /**
  * The array index for the lit green simon button
@@ -247,7 +297,7 @@ const SOUND_FAIL := "assets/sound/fail.wav"
 /**
  * The filename to the introductory sound effect
  */
-const SOUND_INTRO := "assets/sound/tetris.mp3"
+const SOUND_INTRO := "assets/sound/intro.mp3"
 
 /**
  * Internationlization string for loading message
@@ -273,6 +323,11 @@ const I18N_SCORE := "score: "
  * Internationlization string for turn indication prefix
  */
 const I18N_TURN := "turn: "
+
+/**
+ * High score file filename
+ */
+const HIGH_SCORE_FILENAME := ".simon"
 
 /**
  * Play a music file asynchronously
@@ -440,6 +495,16 @@ procedure continueOrExit
 	exit when buttonDown = 1
     end loop
 end continueOrExit
+
+/**
+ * Saves the high score to file
+ */
+procedure saveHighScore
+    if (strint (highScoreFile -> readFile) < iScoreNumber) then
+	highScoreFile -> writeFile (intstr (iScoreNumber))
+    end if
+end saveHighScore
+
 /**
  * This function is called when the player loses
  * Draws the lose endstate card and shows their final score
@@ -453,7 +518,6 @@ procedure failState
     Pic.Draw (failScreen, 0, 0, picCopy)
     Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
     View.Update
-    continueOrExit
 end failState
 
 /**
@@ -470,8 +534,6 @@ procedure winState
     Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
     View.Update
     fork playMusicAsync (SOUND_WIN)
-    continueOrExit
-
 end winState
 
 /**
@@ -532,6 +594,8 @@ procedure mainLoop
     else
 	winState %jump to winState if player managed finish ROUND_LIMIT iterations
     end if
+    saveHighScore %save highscore
+    continueOrExit %wait for user input to repeat game or exit
 end mainLoop
 
 
@@ -560,19 +624,23 @@ procedure entryLoop
 
 
     Pic.Draw (startScreen, 0, 0, picCopy) %Draw the start state card
+    if (highScoreFile -> readFile not= "") then
+	Font.Draw ("high score: " + highScoreFile -> readFile, 0, maxy - 25, font_segoe, black)
+    end if
     View.Update
     Music.PlayFileReturn (SOUND_INTRO)
     loop
-	if konamiCodeCounter = 11 then /*If the user has pressed all the previous keys activate win*/
-	    iScoreNumber := 1337 /*1337haxx0rz*/
+	if konamiCodeCounter = 11 then     /*If the user has pressed all the previous keys activate win*/
+	    iScoreNumber := 1337     /*1337haxx0rz*/
 	    winState
+	    continueOrExit
 	    exit
 	else
-	    Input.KeyDown (chars) /*Check if a key has been pressed*/
+	    Input.KeyDown (chars)     /*Check if a key has been pressed*/
 	    if chars (konamiCode (konamiCodeCounter)) then
-		konamiCodeCounter += 1 /*If part of the Konami code has been pressed go to the next key*/
+		konamiCodeCounter += 1     /*If part of the Konami code has been pressed go to the next key*/
 	    end if
-	    /*Determine number of buttons to use*/
+	     /*Determine number of buttons to use*/
 	    if chars ('1') then
 		buttonCount := 1
 	    end if
@@ -601,7 +669,11 @@ procedure entryLoop
 	end if
     end loop
 end entryLoop
+
+new highScoreFile
+highScoreFile -> ctorTextFile (HIGH_SCORE_FILENAME)
+
 loop
-    entryLoop %Initial call into entry loop
-    exit when bTerminateProgram %Quit when quit flag is triggered
+    entryLoop     %Initial call into entry loop
+    exit when bTerminateProgram     %Quit when quit flag is triggered
 end loop
