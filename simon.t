@@ -670,8 +670,8 @@ procedure entryLoop
     end loop
 end entryLoop
 
-new highScoreFile
-highScoreFile -> ctorTextFile (HIGH_SCORE_FILENAME)
+new highScoreFile %initialize highscore data file
+highScoreFile -> ctorTextFile (HIGH_SCORE_FILENAME) %call TextFile constructor
 
 loop
     entryLoop     %Initial call into entry loop
