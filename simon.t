@@ -659,8 +659,8 @@ procedure entryLoop
 	Mouse.Where (x, y, button)
 	if button = 1 then
 	    loop
-		exit when not Mouse.ButtonMoved ("down")
-		Mouse.ButtonWait ("down", x, y, button, buttonupdown)
+		exit when not Mouse.ButtonMoved ("up")
+		Mouse.ButtonWait ("up", x, y, button, buttonupdown)
 	    end loop
 	    cls
 	    Music.PlayFileStop
