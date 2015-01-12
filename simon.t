@@ -521,7 +521,7 @@ procedure failState
 end failState
 
 /**
- * This function is called when the player wins. RAND_LIMIT turns are required to win the game
+ * This function is called when the player wins. ROUND_LIMIT turns are required to win the game
  * Draws the win endstate card and shows their final score
  */
 procedure winState
