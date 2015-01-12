@@ -26,7 +26,9 @@
 	  - "Append a number (1-4 by default) to a sequence"
 	  - "Parse each number in the sequence and display the corresponding image that has that button lit up"
 	  - "Wait for user to repeat the displayed sequence"
+	  - "Determine if correct button is pressed, if so, increment score by 1"
 	  - "Determine if the user has made a mistake by getting the colour clicked, if so, jump to fail state"
+	  - "Increment score by 2 if the user passes the turn"
 	  - "If 31 (by default) iterations have passed jump to win state"
      Win/Fail State:
 	  - "Display wipe-out animation"
@@ -517,6 +519,7 @@ procedure failState
     end for
     Pic.Draw (failScreen, 0, 0, picCopy)
     Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
+    Font.Draw ("turn :"+intstr (iTurnNumber), maxx - 200, 45, font_segoeBold, white)
     View.Update
 end failState
 
@@ -532,6 +535,8 @@ procedure winState
     end for
     Pic.Draw (winScreen, 0, 0, picCopy)
     Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
+    Font.Draw ("turn :"+intstr (iTurnNumber), maxx - 200, 45, font_segoeBold, white)
+
     View.Update
     fork playMusicAsync (SOUND_WIN)
 end winState
@@ -581,9 +586,10 @@ procedure mainLoop
 		failStateTrue := true
 		exit
 	    end if
-	    iScoreNumber += 1
+	    iScoreNumber += 1 %Correct button press
 	    renderBlank
 	end for
+	iScoreNumber += 2 %perfect turn bonus 
 	if failStateTrue then
 	    fork playMusicAsync (SOUND_FAIL)
 	    exit %If failstate, terminate loop and jump to procedure end
