@@ -43,7 +43,7 @@
 	  'blue.gif': "The image of the blue simon button lit"
 	  'green.gif': "The image of the green simon button lit"
 	  'red.gif': "The image of the red simon button lit"
-	  'start.gif': "The start screen image"
+	  'start.jpeg': "The start screen image"
 	  'win.gif': "The image displayed in winstate"
 	  'lose.gif': "The image displayed in failstate"
      sound:
@@ -120,7 +120,7 @@ var startScreen, failScreen, winScreen : int
 /**
  * The start screen card
  */
-startScreen := Pic.FileNew ("assets/textures/start.gif")
+startScreen := Pic.FileNew ("assets/textures/start.jpeg")
 
 /**
  * The fail end-state card
@@ -281,6 +281,44 @@ const TURN_RENDER_Y := 300
  */
 const TURN_RENDER_X := 310
 
+/**
+ * The X value to render the score number in the end scorecard
+ * @see failState
+ * @see winState
+ */
+const END_SCORE_RENDER_X := maxx - 450
+
+/**
+ * The X value to render the turn number in the end scorecard
+ * @see failState
+ * @see winState
+ */
+const END_TURN_RENDER_X := maxx - 100
+
+/**
+ * The Y value to render the turn and score numbers in the end scorecard
+ * @see failState
+ * @see winState
+ */
+const END_TEXT_RENDER_Y := 45
+
+/**
+ * The X value to render the high score
+ * @see entryLoop
+ */
+const HIGHSCORE_RENDER_X := 150
+
+/**
+ * The Y value to render the high score
+ * @see entryLoop
+ */
+const HIGHSCORE_RENDER_Y := maxy - 41
+
+/**
+ * The score that the player will win if the konami code (up up down down left right left right b a) is used in the opening
+ * @see entryLoop
+ */
+const KONAMI_WIN_SCORE := 1337
 /**
  * The filename to the beep sound effect
  */
@@ -483,7 +521,7 @@ end renderSequence
 /**
  * Wait for user indication to either repeat game or quit
  */
-procedure continueOrExit
+procedure continueOrQuit
     var chars : array char of boolean
     loop
 	var x, y, buttonDown : int
@@ -496,7 +534,7 @@ procedure continueOrExit
 	end if
 	exit when buttonDown = 1
     end loop
-end continueOrExit
+end continueOrQuit
 
 /**
  * Saves the high score to file
@@ -518,8 +556,8 @@ procedure failState
 	View.Update
     end for
     Pic.Draw (failScreen, 0, 0, picCopy)
-    Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
-    Font.Draw ("turn :"+intstr (iTurnNumber), maxx - 200, 45, font_segoeBold, white)
+    Font.Draw (intstr (iScoreNumber), END_SCORE_RENDER_X, END_TEXT_RENDER_Y, font_segoeBold, white)
+    Font.Draw (intstr (iTurnNumber), END_TURN_RENDER_X, END_TEXT_RENDER_Y, font_segoeBold, white)
     View.Update
 end failState
 
@@ -534,9 +572,8 @@ procedure winState
 	View.Update
     end for
     Pic.Draw (winScreen, 0, 0, picCopy)
-    Font.Draw (intstr (iScoreNumber), maxx - 300, 45, font_segoeBold, white)
-    Font.Draw ("turn :"+intstr (iTurnNumber), maxx - 200, 45, font_segoeBold, white)
-
+    Font.Draw (intstr (iScoreNumber), END_SCORE_RENDER_X, END_TEXT_RENDER_Y, font_segoeBold, white)
+    Font.Draw (intstr (iTurnNumber), END_TURN_RENDER_X, END_TEXT_RENDER_Y, font_segoeBold, white)
     View.Update
     fork playMusicAsync (SOUND_WIN)
 end winState
@@ -601,7 +638,7 @@ procedure mainLoop
 	winState %jump to winState if player managed finish ROUND_LIMIT iterations
     end if
     saveHighScore %save highscore
-    continueOrExit %wait for user input to repeat game or exit
+    continueOrQuit %wait for user input to repeat game or exit
 end mainLoop
 
 
@@ -631,15 +668,15 @@ procedure entryLoop
 
     Pic.Draw (startScreen, 0, 0, picCopy) %Draw the start state card
     if (highScoreFile -> readFile not= "") then
-	Font.Draw ("high score: " + highScoreFile -> readFile, 0, maxy - 25, font_segoe, black)
+	Font.Draw (highScoreFile -> readFile, HIGHSCORE_RENDER_X, HIGHSCORE_RENDER_Y, font_segoe, black)
     end if
     View.Update
     Music.PlayFileReturn (SOUND_INTRO)
     loop
 	if konamiCodeCounter = 11 then     /*If the user has pressed all the previous keys activate win*/
-	    iScoreNumber := 1337     /*1337haxx0rz*/
+	    iScoreNumber := KONAMI_WIN_SCORE
 	    winState
-	    continueOrExit
+	    continueOrQuit
 	    exit
 	else
 	    Input.KeyDown (chars)     /*Check if a key has been pressed*/
@@ -665,7 +702,7 @@ procedure entryLoop
 	Mouse.Where (x, y, button)
 	if button = 1 then
 	    loop
-		exit when not Mouse.ButtonMoved ("up")
+		exit when not Mouse.ButtonMoved ("up") %Wait for mouseclick
 		Mouse.ButtonWait ("up", x, y, button, buttonupdown)
 	    end loop
 	    cls
