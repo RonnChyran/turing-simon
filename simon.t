@@ -296,14 +296,16 @@ const END_SCORE_RENDER_X := maxx - 450
 const END_TURN_RENDER_X := maxx - 100
 
 /**
- * The Y value to render the turn and score numbers in the end scorecard
+ * The Y value to render the turn and score numbers in the end f
+ card
  * @see failState
  * @see winState
  */
 const END_TEXT_RENDER_Y := 45
 
 /**
- * The X value to render the high score
+ * The X value to render the high f
+ 
  * @see entryLoop
  */
 const HIGHSCORE_RENDER_X := 150
@@ -626,10 +628,11 @@ procedure mainLoop
 	    iScoreNumber += 1 %Correct button press
 	    renderBlank
 	end for
-	iScoreNumber += 2 %perfect turn bonus 
 	if failStateTrue then
 	    fork playMusicAsync (SOUND_FAIL)
 	    exit %If failstate, terminate loop and jump to procedure end
+	else
+	    iScoreNumber += 2 %perfect turn bonus 
 	end if
     end for
     if failStateTrue then
